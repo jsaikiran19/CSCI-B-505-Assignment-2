@@ -21,7 +21,10 @@ def successors(state):
 
 # check if we've reached the goal
 def is_goal(state):
-    return False
+    for i in range(len(state)):
+        if state[i]!=i+1:
+            return False        
+    return True
 
 def solve(initial_board):
     """
