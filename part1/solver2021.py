@@ -19,6 +19,12 @@ def printable_board(board):
 def successors(state):
     return True
 
+def heuristic_function(state):
+    misplaced_tiles = 0
+    for i in range(len(state)):
+        if state[i]!=i+1:
+            misplaced_tiles+=1
+    return misplaced_tiles
 # check if we've reached the goal
 def is_goal(state):
     for i in range(len(state)):
