@@ -16,8 +16,12 @@ def printable_board(board):
 
 
 # return a list of possible successor states
-def successors(state):
-    return True
+def successors(state,moves=[]):
+    states = []
+    for i in range(0,25,5):
+        states.append((state[0:i]+state[i+1:i+5]+[state[i]]+state[i+5:],moves+['L'+str(i//5+1)]))
+        states.append((state[0:i]+[state[i+4]]+state[i:i+4]+state[i+5:],moves+['R'+str(i//5+1)]))
+    return states
 
 def heuristic_function(state):
     misplaced_tiles = 0
@@ -61,6 +65,6 @@ if __name__ == "__main__":
     print("Start state: \n" +"\n".join(printable_board(tuple(start_state))))
 
     print("Solving...")
+    print(successors(start_state))
     route = solve(tuple(start_state))
-    
     print("Solution found in " + str(len(route)) + " moves:" + "\n" + " ".join(route))
