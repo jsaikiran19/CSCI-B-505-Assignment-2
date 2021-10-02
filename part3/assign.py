@@ -90,29 +90,32 @@ def solver(input_file):
     all_cost_combs = []
     all_solutions = []
     for user in costs.keys():
-        sorted_cost_combs = sorted(costs[user].items(), key=lambda x: x[1])
+        sorted_cost_combs = list(costs[user].items())
         all_cost_combs+=sorted_cost_combs
     # print(all_cost_combs)
-    previous_cost = sys.float_info.max
-    for cost_comb in all_cost_combs:
-            lowest_cost_comb = list(cost_comb)
-            if all([name not in final_names for name in lowest_cost_comb[0].split('-')]):
-                lowest_cost_comb_list = lowest_cost_comb[0].split('-')
-                if len(lowest_cost_comb_list) == 3:
-                    lowest_cost_comb[1] += costs[lowest_cost_comb_list[1]][f'{lowest_cost_comb_list[1]}-{lowest_cost_comb_list[0]}-{lowest_cost_comb_list[2]}']
-                    lowest_cost_comb[1] += costs[lowest_cost_comb_list[2]][f'{lowest_cost_comb_list[2]}-{lowest_cost_comb_list[0]}-{lowest_cost_comb_list[1]}']
-                if len(lowest_cost_comb_list) == 2:
-                    lowest_cost_comb[1] += costs[lowest_cost_comb_list[1]][f'{lowest_cost_comb_list[1]}-{lowest_cost_comb_list[0]}']
-                final_combs.append(lowest_cost_comb)
-                final_names += lowest_cost_comb[0].split('-')
-            if sorted(final_names)==sorted(names):
-                        current_groups = list(map(lambda x:x[0],final_combs))
-                        current_cost = sum(list(map(lambda x:x[1],final_combs)))+len(current_groups)*5
-                        if previous_cost>current_cost:
-                            previous_cost = current_cost
-                            final_names = []
-                            final_combs = []
-                            yield {"assigned-groups":current_groups,"total-cost":previous_cost}
+    import random
+    final_cost = sys.float_info.max
+    while True:
+        for cost_comb in all_cost_combs:
+                lowest_cost_comb = list(cost_comb)
+                if all([name not in final_names for name in lowest_cost_comb[0].split('-')]):
+                    lowest_cost_comb_list = lowest_cost_comb[0].split('-')
+                    if len(lowest_cost_comb_list) == 3:
+                        lowest_cost_comb[1] += costs[lowest_cost_comb_list[1]][f'{lowest_cost_comb_list[1]}-{lowest_cost_comb_list[0]}-{lowest_cost_comb_list[2]}']
+                        lowest_cost_comb[1] += costs[lowest_cost_comb_list[2]][f'{lowest_cost_comb_list[2]}-{lowest_cost_comb_list[0]}-{lowest_cost_comb_list[1]}']
+                    if len(lowest_cost_comb_list) == 2:
+                        lowest_cost_comb[1] += costs[lowest_cost_comb_list[1]][f'{lowest_cost_comb_list[1]}-{lowest_cost_comb_list[0]}']
+                    final_combs.append(lowest_cost_comb)
+                    final_names += lowest_cost_comb[0].split('-')
+                if sorted(final_names)==sorted(names):
+                            current_groups = list(map(lambda x:x[0],final_combs))
+                            current_cost = sum(list(map(lambda x:x[1],final_combs)))+len(current_groups)*5
+                            if final_cost>current_cost:
+                                final_cost = current_cost
+                                final_names = []
+                                final_combs = []
+                                yield {"assigned-groups":current_groups,"total-cost":final_cost}
+        random.shuffle(all_cost_combs)
             # c =0
             # for name in lowest_cost_comb[0].split('-'):
             #     if name in final_names:
