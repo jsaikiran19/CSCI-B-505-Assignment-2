@@ -118,13 +118,15 @@ def successors(board,path=[]):
 def manhattan_distance(a,b):
     return abs(a[0]-b[0])+abs(a[1]-b[1])
 
+#Referred the following link to scale my heuristic better with g(n)
+#http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
 def heuristic_function(state):
     cost = 0
     for i in range(len(state)):
         pos = (i//5,i%5)
         goal_pos = get_goal_position(state[i])
         cost += manhattan_distance(pos,goal_pos)
-    return cost
+    return cost*0.25
 # check if we've reached the goal
 def is_goal(state):
     for i in range(len(state)):
