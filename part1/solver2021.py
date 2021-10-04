@@ -153,7 +153,7 @@ def solve(initial_board):
             child_in_fringe = list(filter(lambda n: n[1][0]==child[0] and n[1][1]>child[1],(fringe.queue)))
             if is_goal(child[0]):
                 return child[1]
-            if child in visited:
+            if child[0] in visited:
                 continue
             if child_in_fringe:
                 updated_fringe = list(fringe.queue)
