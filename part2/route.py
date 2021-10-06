@@ -41,24 +41,31 @@ def get_route(start, end, cost):
     route_taken = []
     total_miles = 0.00
     total_hours = 0.00
+    delivery_hours = 0.00
 
     if cost == 'distance':
         path = shortest_distance(start, end)
-        print(path)
     if cost == 'segments':
         path = least_segments(start, end)
     if cost == 'time':
         path = least_time(start, end)
+    if cost == 'delivery':
+        path = least_delivery(start, end)
+        
+    print(path)
 
     for p in path:
-            total_miles += float(p[2])
-            total_hours += (float(p[2])/float(p[3]))
+            distance = float(p[2])
+            speed_limit = float(p[3])
+            total_miles += distance
+            total_hours += distance/speed_limit
+            delivery_hours += calculate_delivery_hours(p, delivery_hours)
             route_taken.append((p[1], f'{p[4]} for {p[2]} miles'))
     
     return {"total-segments" : len(route_taken), 
             "total-miles" : total_miles, 
             "total-hours" : total_hours, 
-            "total-delivery-hours" : 1.1364, 
+            "total-delivery-hours" : delivery_hours, 
             "route-taken" : route_taken}
 
 def shortest_distance(start, end):
@@ -82,10 +89,11 @@ def shortest_distance(start, end):
                 segment[0], segment[1] = segment[1], segment[0]
             if segment[0] == curr_city:
                 succ_city_coord = city_gps.get(segment[1])
-                new_succ = (cost + haversine(succ_city_coord, end_city_coord), segment[1], path + [segment])
+                heuristic = haversine(succ_city_coord, end_city_coord)/3
+                updated_path = path + [segment]
+                new_succ = (sum([int(p[2]) for p in updated_path]) + heuristic, segment[1], updated_path)
                 fringe_queue.put(new_succ)
                 visited.append(segment)
-                print('FRINGE_SIZE:', fringe_queue.qsize())
 
     return []
 
@@ -110,10 +118,11 @@ def least_segments(start, end):
                 segment[0], segment[1] = segment[1], segment[0]
             if segment[0] == curr_city:
                 succ_city_coord = city_gps.get(segment[1])
-                new_succ = (no_of_segments + (haversine(succ_city_coord, end_city_coord)/25), segment[1], path + [segment])
+                heuristic = haversine(succ_city_coord, end_city_coord)/923
+                updated_path = path + [segment]
+                new_succ = (len(updated_path) + heuristic, segment[1], updated_path)
                 fringe_queue.put(new_succ)
                 visited.append(segment)
-                print('FRINGE_SIZE:', fringe_queue.qsize())
 
     return []
 
@@ -128,7 +137,7 @@ def least_time(start, end):
     visited = []
 
     while not fringe_queue.empty():
-        (no_of_segments, curr_city, path) = fringe_queue.get()
+        (time, curr_city, path) = fringe_queue.get()
         if curr_city == end:
             return path
         for segment in road_segments:
@@ -138,10 +147,43 @@ def least_time(start, end):
                 segment[0], segment[1] = segment[1], segment[0]
             if segment[0] == curr_city:
                 succ_city_coord = city_gps.get(segment[1])
-                new_succ = (no_of_segments + (haversine(succ_city_coord, end_city_coord)/50), segment[1], path + [segment])
+                heuristic = haversine(succ_city_coord, end_city_coord)/90
+                updated_path = path + [segment]
+                new_succ = (sum([int(p[2])/int(p[3]) for p in updated_path]) + heuristic, segment[1], updated_path)
                 fringe_queue.put(new_succ)
                 visited.append(segment)
-                print('FRINGE_SIZE:', fringe_queue.qsize())
+
+    return []
+
+def least_delivery(start, end):
+    city_gps = parse_city_gps()
+    end_city_coord = city_gps.get(end)
+
+    road_segments = parse_road_segments()
+
+    fringe_queue = PriorityQueue()
+    fringe_queue.put((0, start, []))
+    visited = []
+
+    while not fringe_queue.empty():
+        (delivery_hours, curr_city, path) = fringe_queue.get()
+        if curr_city == end:
+            return path
+        for segment in road_segments:
+            if segment in visited:
+                continue
+            if segment[1] == curr_city:
+                segment[0], segment[1] = segment[1], segment[0]
+            if segment[0] == curr_city:
+                succ_city_coord = city_gps.get(segment[1])
+                heuristic = (haversine(succ_city_coord, end_city_coord) * int(segment[2]))
+                updated_path = path + [segment]
+                t_trip = 0
+                for p in updated_path:
+                    t_trip += calculate_delivery_hours(p, t_trip)
+                new_succ = (t_trip + heuristic, segment[1], updated_path)
+                fringe_queue.put(new_succ)
+                visited.append(segment)
 
     return []
     
@@ -159,6 +201,14 @@ def parse_city_gps():
 def parse_road_segments():
         with open('part2/road-segments.txt', "r") as f:
                 return [line.split() for line in f.read().rstrip("\n").split("\n")]
+
+def calculate_delivery_hours(segment, t_trip = 0):
+    distance = float(segment[2])
+    speed_limit = float(segment[3])
+    if speed_limit < 50:
+        return distance/speed_limit
+    prob = math.tanh(distance/1000)
+    return distance/speed_limit + (prob * 2 * (distance/speed_limit + t_trip))
 
 # Calculate distance between two coordinates (Ref: https://janakiev.com/blog/gps-points-distance-python/)
 def haversine(coord1, coord2):
