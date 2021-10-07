@@ -5,12 +5,7 @@
 #
 # Based on skeleton code by D. Crandall and B551 Staff, September 2021
 #
-
-from itertools import combinations, permutations
-from os import name
 import sys
-import time
-from queue import PriorityQueue
 
 def differenceOfLists(list1, list2):
     return (list(set(list1) - set(list2)))
@@ -20,82 +15,12 @@ def fitnessFunction(team,rTeam):
     fitness=0
     for member in aTeam:
         userMap=list(filter(lambda user:user['user']==member,rTeam))[0]
-        love=3 if any((pref not in ['xxx', 'zzz'] and pref not in aTeam) for pref in userMap['workWith']) else 0
+        love=len(differenceOfLists(list(filter(lambda x:x not in ['xxx','zzz'],userMap['workWith'])),aTeam))*3
         hate=len([ member for member in aTeam if member in userMap['notWorkWith'] ])*10
-        sizeAnomaly = 2 if len(userMap['workWith'])==len(aTeam) else 0
-        fitness += love + hate + sizeAnomaly + (3 - len(aTeam)) * 5
+        sizeAnomaly = 2 if len(userMap['workWith'])!=len(aTeam) else 0
+        fitness += love + hate + sizeAnomaly
     return fitness
-
-def calculateCost(teams, rTeam):
-    # 1. grading time
-    grading = len(teams) * 5
-
-    # 2. Size mismatch time
-    totalMissedSizes = 0
-    totalMissFav = 0
-    totalDeanTime=0
-
-    for user in rTeam:
-        for team in teams:
-            if user['user'] in team:
-                thisTeam = team.split('-')
-                if len(thisTeam) != len(user['workWith']):
-                    totalMissedSizes += 1
-                # user fav team will not have user itself, and no preference is not considered
-                userFavTeam = [member for member in user['workWith']
-                               if member != user['user'] and member not in ['xxx', 'zzz']]
-                # #people with whom the user may share code. 
-                totalMissFav += len(differenceOfLists(userFavTeam,
-                                    thisTeam))
-                # #people with whom the user got assigned, against his choice
-                userHateTeam = [ member for member in thisTeam if member in user['notWorkWith'] ]
-                totalDeanTime += len(userHateTeam)
     
-
-    return (totalDeanTime * 10 + totalMissedSizes * 2 + grading + totalMissFav * 3)
-
-
-        
-
-# def comput_cost(comb, preferences,costs = {}):
-#         pref = preferences[comb[0]]
-#         pref_list = pref[0].split('-')
-#         comb_str = "-".join(comb)
-#         cost = 0
-        
-#         if any([user not in comb and user not in ['xxx', 'zzz'] for user in pref[0].split('-')]):
-#                 if comb[0] not in costs.keys():
-#                     costs[comb[0]] = {comb_str:3}
-#                 else:
-#                     costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 3 if comb_str in costs[comb[0]].keys() else 3
-#         if len(pref_list) == len(comb):
-#             if all(user in pref[0] or 'xxx' in pref[0] for user in comb):
-#                 if comb[0] not in costs.keys():
-#                     # c = 0
-#                     costs[comb[0]] = {comb_str:0}
-#                 else:
-#                     costs[comb[0]][comb_str] = costs[comb[0]][comb_str] if comb_str in costs[comb[0]].keys() else 0
-#             # else:
-#             #     # c = 3
-#             #     if comb[0] not in costs.keys():
-#             #         costs[comb[0]] = {comb_str:3}
-#             #     else:
-#             #         costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 3 if comb_str in costs[comb[0]].keys() else 3
-#         else:
-#             # c = 2
-#             if comb[0] not in costs.keys():
-#                 costs[comb[0]] = {comb_str:2}
-#             else:
-#                 costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 2 if comb_str in costs[comb[0]].keys() else 2
-#         not_work_list = pref[1].split(',')
-#         if any(p in comb for p in not_work_list):
-#             # c = 10
-#             if comb[0] not in costs.keys():
-#                 costs[comb[0]] = {comb_str:10}
-#             else:
-#                 costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 10 if comb_str in costs[comb[0]].keys() else 10
-#         return costs
-
 def solver(input_file):
     """
     1. This function should take the name of a .txt input file in the format indicated in the assignment.
@@ -131,7 +56,7 @@ def solver(input_file):
                     final_names += lowest_cost_comb[0]
                 if sorted(final_names)==sorted(names):
                             current_groups = list(map(lambda x:'-'.join(x[0]),final_combs))
-                            current_cost = calculateCost(current_groups, preferences)
+                            current_cost = sum(list(map(lambda x:x[1],final_combs)))+len(current_groups)*5
                             final_names = []
                             final_combs = []
                             if final_cost>current_cost:
