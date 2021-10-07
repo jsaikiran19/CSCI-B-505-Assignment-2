@@ -193,12 +193,12 @@ def least_delivery(start, end):
 
 
 def parse_city_gps():
-        with open('part2/city-gps.txt', "r") as f:
+        with open('city-gps.txt', "r") as f:
                 return {line.split()[0]: tuple(line.split()[1:]) for line in f.read().rstrip("\n").split("\n")}
 
 def parse_road_segments():
     cities_map = {}
-    with open('part2/road-segments.txt', "r") as f:
+    with open('road-segments.txt', "r") as f:
             for line in f.read().rstrip("\n").split("\n"):
                 start = line.split()[0]
                 end = line.split()[1]
