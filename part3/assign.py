@@ -57,46 +57,44 @@ def calculateCost(teams, rTeam):
 
         
 
-def comput_cost(comb, preferences,costs = {}):
-        pref = preferences[comb[0]]
-        pref_list = pref[0].split('-')
-        comb_str = "-".join(comb)
-        cost = 0
-        # if comb == ['fanjun', 'djcran']:
-        #     print(pref_list, comb)
+# def comput_cost(comb, preferences,costs = {}):
+#         pref = preferences[comb[0]]
+#         pref_list = pref[0].split('-')
+#         comb_str = "-".join(comb)
+#         cost = 0
         
-        if any([user not in comb and user not in ['xxx', 'zzz'] for user in pref[0].split('-')]):
-                if comb[0] not in costs.keys():
-                    costs[comb[0]] = {comb_str:3}
-                else:
-                    costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 3 if comb_str in costs[comb[0]].keys() else 3
-        if len(pref_list) == len(comb):
-            if all(user in pref[0] or 'xxx' in pref[0] for user in comb):
-                if comb[0] not in costs.keys():
-                    # c = 0
-                    costs[comb[0]] = {comb_str:0}
-                else:
-                    costs[comb[0]][comb_str] = costs[comb[0]][comb_str] if comb_str in costs[comb[0]].keys() else 0
-            # else:
-            #     # c = 3
-            #     if comb[0] not in costs.keys():
-            #         costs[comb[0]] = {comb_str:3}
-            #     else:
-            #         costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 3 if comb_str in costs[comb[0]].keys() else 3
-        else:
-            # c = 2
-            if comb[0] not in costs.keys():
-                costs[comb[0]] = {comb_str:2}
-            else:
-                costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 2 if comb_str in costs[comb[0]].keys() else 2
-        not_work_list = pref[1].split(',')
-        if any(p in comb for p in not_work_list):
-            # c = 10
-            if comb[0] not in costs.keys():
-                costs[comb[0]] = {comb_str:10}
-            else:
-                costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 10 if comb_str in costs[comb[0]].keys() else 10
-        return costs
+#         if any([user not in comb and user not in ['xxx', 'zzz'] for user in pref[0].split('-')]):
+#                 if comb[0] not in costs.keys():
+#                     costs[comb[0]] = {comb_str:3}
+#                 else:
+#                     costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 3 if comb_str in costs[comb[0]].keys() else 3
+#         if len(pref_list) == len(comb):
+#             if all(user in pref[0] or 'xxx' in pref[0] for user in comb):
+#                 if comb[0] not in costs.keys():
+#                     # c = 0
+#                     costs[comb[0]] = {comb_str:0}
+#                 else:
+#                     costs[comb[0]][comb_str] = costs[comb[0]][comb_str] if comb_str in costs[comb[0]].keys() else 0
+#             # else:
+#             #     # c = 3
+#             #     if comb[0] not in costs.keys():
+#             #         costs[comb[0]] = {comb_str:3}
+#             #     else:
+#             #         costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 3 if comb_str in costs[comb[0]].keys() else 3
+#         else:
+#             # c = 2
+#             if comb[0] not in costs.keys():
+#                 costs[comb[0]] = {comb_str:2}
+#             else:
+#                 costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 2 if comb_str in costs[comb[0]].keys() else 2
+#         not_work_list = pref[1].split(',')
+#         if any(p in comb for p in not_work_list):
+#             # c = 10
+#             if comb[0] not in costs.keys():
+#                 costs[comb[0]] = {comb_str:10}
+#             else:
+#                 costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 10 if comb_str in costs[comb[0]].keys() else 10
+#         return costs
 
 def solver(input_file):
     """
@@ -112,7 +110,6 @@ def solver(input_file):
        our test program will take the last answer you 'yielded' once time expired.
     """
 
-    import copy
     from itertools import combinations
     preferences = readInputFiles(input_file)
     names_comb = []
@@ -141,60 +138,6 @@ def solver(input_file):
                                 final_cost = current_cost
                                 yield {"assigned-groups":current_groups,"total-cost":final_cost}
         random.shuffle(all_cost_combs)
-            # c =0
-            # for name in lowest_cost_comb[0].split('-'):
-            #     if name in final_names:
-            #         break
-            #     else:
-            #         c+=1
-            # if c==len(lowest_cost_comb[0].split('-')):
-            #     final_combs.append(lowest_cost_comb)
-            #     final_names+=lowest_cost_comb[0].split('-')
-    # print(final_names)
-    # print(final_combs)
-
-    # print((costs))
-        # if True:
-        #     if comb[1] in pref[0] and comb[2] in pref[0]:
-        #         print('if1')
-        #         if comb[0] not in costs.keys():
-        #             costs[comb[0]] = {"-".join(comb):0}
-        #         else:
-        #             costs[comb[0]][comb_str] = costs[comb[0]][comb_str] if comb_str in costs[comb[0]].keys() else 0 
-        #     elif comb[1] in pref[0] or comb[2] in pref[0]:
-        #         print('if2')
-        #         if comb[0] not in costs.keys():
-        #             costs[comb[0]] = {"-".join(comb):2}
-        #         else:
-        #             costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 2 if comb_str in costs[comb[0]].keys() else 2
-        #     else:
-        #         if comb[0] not in costs.keys():
-        #             costs[comb[0]] = {"-".join(comb):4}
-        #         else:
-        #             costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 4 if comb_str in costs[comb[0]].keys() else 4
-        #     if pref[1] in comb:
-        #         if comb[0] not in costs.keys():
-        #             costs[comb[0]] = {"-".join(comb):10}
-        #         else:
-        #             costs[comb[0]][comb_str] = costs[comb[0]][comb_str] + 10 if comb_str in costs[comb[0]].keys() else 10
-        
-    # print(len(names_comb))
-    # Simple example. First we yield a quick solution
-    # yield({"assigned-groups": ["vibvats-djcran-zkachwal", "shah12", "vrmath"],
-    #            "total-cost" : 12})
-
-    # # Then we think a while and return another solution:
-    # time.sleep(10)
-    # yield({"assigned-groups": ["vibvats-djcran-zkachwal", "shah12-vrmath"],
-    #            "total-cost" : 10})
-
-    # This solution will never befound, but that's ok; program will be killed eventually by the
-    #  test script.
-    # while True:
-    #     pass
-    
-    # yield({"assigned-groups": ["vibvats-djcran", "zkachwal-shah12-vrmath"],
-    #            "total-cost" : 9})
 
 def parse_responses(path):
     names_dict = {}
