@@ -118,15 +118,27 @@ def successors(board,path=[]):
 def manhattan_distance(a,b):
     return abs(a[0]-b[0])+abs(a[1]-b[1])
 
+# def sort_by_heuristic(state1,state2):
+#     h1 = heuristic_function(state1[0])
+#     h2 = heuristic_function(state2[0])
+#     f1 = h1+len(state1[1])
+#     f2 = h1+len(state2[1])
+#     if f1==f2:
+#         return h1-h2
+#     return f1-f2
 #Referred the following link to scale my heuristic better with g(n)
 #http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
-def heuristic_function(state):
-    cost = 0
+def heuristic_function(state,scaling_factor=1):
+    cost1 = 0
+    # cost2 = 0
     for i in range(len(state)):
         pos = (i//5,i%5)
         goal_pos = get_goal_position(state[i])
-        cost += manhattan_distance(pos,goal_pos)
-    return cost*0.25
+        cost1 += manhattan_distance(pos,goal_pos)
+        # cost2 += 1 if state[i] != i+1 else 0
+    # print((cost1*0.25 + cost2*0.125)/2)
+    # print(cost1,cost2)
+    return cost1*scaling_factor
 # check if we've reached the goal
 def is_goal(state):
     for i in range(len(state)):
@@ -145,14 +157,15 @@ def solve(initial_board):
     5. The current code just returns a dummy solution.
     """
     fringe = PriorityQueue()
-    fringe.put((0,(list(initial_board),[])))
+    fringe.put((0,0,(list(initial_board),[])))
+    scaling_factor = 0.25 if heuristic_function(initial_board)/6>8 else 0.125
     visited = []
     while fringe:
-        (cost,board_map) = fringe.get()
-        # print(board_map[0],len(board_map[1]))
+        (cost,h,board_map) = fringe.get()
+        print(cost,board_map[0],(board_map[1]))
         visited.append(board_map[0])
         for child in successors(board_map[0],board_map[1]):
-            child_in_fringe = list(filter(lambda n: n[1][0]==child[0] and n[1][1]>child[1],(fringe.queue)))
+            child_in_fringe = list(filter(lambda n: n[2][0]==child[0] and n[2][1]>child[1],(fringe.queue)))
             if is_goal(child[0]):
                 return child[1]
             if child[0] in visited:
@@ -162,8 +175,8 @@ def solve(initial_board):
                 for c in child_in_fringe:
                     updated_fringe.remove(c)
                 fringe.queue = updated_fringe
-            elif not list(filter(lambda n:n[1][0]==child[0],list(fringe.queue))):
-                fringe.put((heuristic_function(child[0])+len(child[1]),child))
+            elif not list(filter(lambda n:n[2][0]==child[0],list(fringe.queue))):
+                fringe.put((heuristic_function(child[0],scaling_factor)+len(child[1]),heuristic_function(child[0],scaling_factor),child))
     return False
 
 # Please don't modify anything below this line
@@ -185,3 +198,4 @@ if __name__ == "__main__":
     print("Solving...")
     route = solve(tuple(start_state))
     print("Solution found in " + str(len(route)) + " moves:" + "\n" + " ".join(route))
+    
