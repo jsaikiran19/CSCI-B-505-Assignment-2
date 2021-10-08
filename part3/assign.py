@@ -6,9 +6,14 @@
 # Based on skeleton code by D. Crandall and B551 Staff, September 2021
 #
 import sys
+from itertools import combinations
+import random
+
 
 def differenceOfLists(list1, list2):
     return (list(set(list1) - set(list2)))
+
+# fitness = how expensive is a person/combination
 
 def fitnessFunction(team,rTeam):
     aTeam=team.split('-')
@@ -35,18 +40,20 @@ def solver(input_file):
        our test program will take the last answer you 'yielded' once time expired.
     """
 
-    from itertools import combinations
     preferences = readInputFiles(input_file)
     names_comb = []
     names = [res.get('user') for res in preferences]
+    # create every possible combination of names of sizes (1,2,3)
     names_comb = list(combinations(names,3))+list(combinations(names,2))+list(combinations(names,1))
     all_cost_combs = []
+    # map combos with respective fitness
     for comb in names_comb:
         all_cost_combs.append((comb, fitnessFunction('-'.join(comb), preferences)))
+
+    # sort the name combination in ASC of fitness 
     all_cost_combs = sorted(all_cost_combs,key=lambda x:x[1])
     final_combs = []
     final_names =[]
-    import random
     final_cost = sys.float_info.max
     while True:
         for cost_comb in all_cost_combs:
@@ -54,7 +61,10 @@ def solver(input_file):
                 if not any([name in final_names for name in lowest_cost_comb[0]]):
                     final_combs.append(lowest_cost_comb)
                     final_names += lowest_cost_comb[0]
-                if sorted(final_names)==sorted(names):
+
+                # if a valid team 
+                # yield if least cost till now
+                if sorted(final_names)==sorted(names): 
                             current_groups = list(map(lambda x:'-'.join(x[0]),final_combs))
                             current_cost = sum(list(map(lambda x:x[1],final_combs)))+len(current_groups)*5
                             final_names = []
@@ -79,7 +89,6 @@ def readInputFiles(input_file):
 
     def mapUserData(user):
         workWith = user[1].split('-')
-        # workWith.remove(user[0])
         return {'user': user[0], 'workWith': workWith, 'notWorkWith': user[2].split(',')}
     return list(map(mapUserData, data))
 
