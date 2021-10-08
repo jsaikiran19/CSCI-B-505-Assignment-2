@@ -53,7 +53,7 @@ def get_route(start, end, cost):
     if cost == 'delivery':
         path = least_delivery(start, end)
         
-    print(path)
+    # print(path)
 
     for p in path:
             distance = float(p[2])

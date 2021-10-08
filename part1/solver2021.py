@@ -162,7 +162,7 @@ def solve(initial_board):
     visited = []
     while fringe:
         (cost,h,board_map) = fringe.get()
-        print(cost,board_map[0],(board_map[1]))
+        # print(cost,board_map[0],(board_map[1]))
         visited.append(board_map[0])
         for child in successors(board_map[0],board_map[1]):
             child_in_fringe = list(filter(lambda n: n[2][0]==child[0] and n[2][1]>child[1],(fringe.queue)))
