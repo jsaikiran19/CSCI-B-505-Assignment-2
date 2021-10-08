@@ -5,10 +5,22 @@
 #
 # Based on skeleton code by D. Crandall and B551 Staff, September 2021
 #
-
 import sys
-import time
 
+def differenceOfLists(list1, list2):
+    return (list(set(list1) - set(list2)))
+
+def fitnessFunction(team,rTeam):
+    aTeam=team.split('-')
+    fitness=0
+    for member in aTeam:
+        userMap=list(filter(lambda user:user['user']==member,rTeam))[0]
+        love=len(differenceOfLists(list(filter(lambda x:x not in ['xxx','zzz'],userMap['workWith'])),aTeam))*3
+        hate=len([ member for member in aTeam if member in userMap['notWorkWith'] ])*10
+        sizeAnomaly = 2 if len(userMap['workWith'])!=len(aTeam) else 0
+        fitness += love + hate + sizeAnomaly
+    return fitness
+    
 def solver(input_file):
     """
     1. This function should take the name of a .txt input file in the format indicated in the assignment.
@@ -23,22 +35,53 @@ def solver(input_file):
        our test program will take the last answer you 'yielded' once time expired.
     """
 
-    # Simple example. First we yield a quick solution
-    yield({"assigned-groups": ["vibvats-djcran-zkachwal", "shah12", "vrmath"],
-               "total-cost" : 12})
-
-    # Then we think a while and return another solution:
-    time.sleep(10)
-    yield({"assigned-groups": ["vibvats-djcran-zkachwal", "shah12-vrmath"],
-               "total-cost" : 10})
-
-    # This solution will never befound, but that's ok; program will be killed eventually by the
-    #  test script.
+    from itertools import combinations
+    preferences = readInputFiles(input_file)
+    names_comb = []
+    names = [res.get('user') for res in preferences]
+    names_comb = list(combinations(names,3))+list(combinations(names,2))+list(combinations(names,1))
+    all_cost_combs = []
+    for comb in names_comb:
+        all_cost_combs.append((comb, fitnessFunction('-'.join(comb), preferences)))
+    all_cost_combs = sorted(all_cost_combs,key=lambda x:x[1])
+    final_combs = []
+    final_names =[]
+    import random
+    final_cost = sys.float_info.max
     while True:
-        pass
-    
-    yield({"assigned-groups": ["vibvats-djcran", "zkachwal-shah12-vrmath"],
-               "total-cost" : 9})
+        for cost_comb in all_cost_combs:
+                lowest_cost_comb = list(cost_comb)
+                if not any([name in final_names for name in lowest_cost_comb[0]]):
+                    final_combs.append(lowest_cost_comb)
+                    final_names += lowest_cost_comb[0]
+                if sorted(final_names)==sorted(names):
+                            current_groups = list(map(lambda x:'-'.join(x[0]),final_combs))
+                            current_cost = sum(list(map(lambda x:x[1],final_combs)))+len(current_groups)*5
+                            final_names = []
+                            final_combs = []
+                            if final_cost>current_cost:
+                                final_cost = current_cost
+                                yield {"assigned-groups":current_groups,"total-cost":final_cost}
+        random.shuffle(all_cost_combs)
+
+def parse_responses(path):
+    names_dict = {}
+    with open(path, "r") as f:
+                for line in f.read().rstrip("\n").split("\n"):
+                    names_dict[line.split()[0]] = line.split()[1:] 
+    return names_dict
+
+def readInputFiles(input_file):
+    data = []
+    with open(input_file, 'r') as file:
+        for line in file:
+            data.append([user for user in line.split()])
+
+    def mapUserData(user):
+        workWith = user[1].split('-')
+        # workWith.remove(user[0])
+        return {'user': user[0], 'workWith': workWith, 'notWorkWith': user[2].split(',')}
+    return list(map(mapUserData, data))
 
 if __name__ == "__main__":
     if(len(sys.argv) != 2):
