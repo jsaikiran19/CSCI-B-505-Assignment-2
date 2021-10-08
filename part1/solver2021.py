@@ -158,7 +158,7 @@ def solve(initial_board):
     """
     fringe = PriorityQueue()
     fringe.put((0,0,(list(initial_board),[])))
-    scaling_factor = 0.25 if heuristic_function(initial_board)/6>8 else 0.125
+    scaling_factor = 0.25 if heuristic_function(initial_board)>50 else 0.125
     visited = []
     while fringe:
         (cost,h,board_map) = fringe.get()
