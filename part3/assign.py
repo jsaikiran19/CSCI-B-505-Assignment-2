@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # assign.py : Assign people to teams
 #
-# Code by: name IU ID
+# Code by: Jagrut Chaudhari (jagchau), Sai Kiran Jella (sjella), Prasad Hegde(phedge)
 #
 # Based on skeleton code by D. Crandall and B551 Staff, September 2021
 #

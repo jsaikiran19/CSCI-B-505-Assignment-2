@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # route.py : Find routes through maps
 #
-# Code by: name IU ID
+# Code by: Jagrut Chaudhari (jagchau), Sai Kiran Jella (sjella), Prasad Hegde(phedge)
 #
 # Based on skeleton code by V. Mathur and D. Crandall, January 2021
 #
@@ -119,7 +119,7 @@ def least_segments(start, end):
                 segment[0], segment[1] = segment[1], segment[0]
             if segment[0] == curr_city:
                 succ_city_coord = city_gps.get(segment[1])
-                heuristic = haversine(succ_city_coord, end_city_coord)/923
+                heuristic = haversine(succ_city_coord, end_city_coord)/923 # Dividing by the largest segment distance
                 updated_path = path + [segment]
                 new_succ = (len(updated_path) + heuristic, segment[1], updated_path)
                 fringe_queue.put(new_succ)
@@ -148,7 +148,7 @@ def least_time(start, end):
                 segment[0], segment[1] = segment[1], segment[0]
             if segment[0] == curr_city:
                 succ_city_coord = city_gps.get(segment[1])
-                heuristic = haversine(succ_city_coord, end_city_coord)/90
+                heuristic = (haversine(succ_city_coord, end_city_coord)/65)/1.5
                 updated_path = path + [segment]
                 new_succ = (actual_time + heuristic, segment[1], updated_path, actual_time + int(segment[2])/int(segment[3]))
                 fringe_queue.put(new_succ)

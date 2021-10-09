@@ -1,8 +1,7 @@
 #!/usr/local/bin/python3
 # solver2021.py : 2021 Sliding tile puzzle solver
 #
-# Code by: name IU ID
-#
+# Code by: Jagrut Chaudhari (jagchau), Sai Kiran Jella (sjella), Prasad Hegde(phedge)
 # Based on skeleton code by D. Crandall & B551 Staff, September 2021
 #
 from queue import PriorityQueue
